@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Translations
-    </title>
-</head>
 <body>
 <h1>Translations</h1>
 <div>
-    <ul>
-    </ul>
-    <h2>Words from variable a:</h2>
-    <ul>
-        {% for word in b.split() %}
-             <span class="tooltip" id="word" about="{{ word[0] }}">{{ word[1].split()[0] }}</span>
-        {% endfor %}
-    </ul>
+    <div>
+        {%- for index, word in words -%}
+            <span {% if index|int != -1 %}
+                    class="tooltip"
+                    id="word"
+                    about="{{ index }}"
+                {% endif %}
+            >{{ word|safe }}</span>
+        {%- endfor -%}
+    </div>
 </div>
 
 </body>

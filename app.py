@@ -1,3 +1,5 @@
+import re
+
 from flask import Flask, render_template
 
 from config import Config
@@ -20,8 +22,18 @@ app = create_app()
 @app.route('/')
 def index():
     book = """Макаронлар, лезетли! малинаны. марлядан мархагъа мансурлы"""
+    words_and_punctuation = re.findall(r'\w+|\W+', book)
 
+    counter = 0
+    book_words = []
+    for item in words_and_punctuation:
+        if item.isalpha():
+            book_words.append([counter, item])
+            counter += 1
+        else:
+            book_words.append([-1, item.replace(' ', '&nbsp;')])
 
+    print(book_words)
 
     a = (book
          .replace(',', '')
@@ -47,7 +59,7 @@ def index():
             print(f'{word} => {db_word.word} - {db_word.translation}')
             translations[i] = (db_word.word, db_word.translation)
 
-    return render_template('index.html', translations=translations, b=book_words)
+    return render_template('index.html', translations=translations, words=book_words)
 
 
 if __name__ == '__main__':
