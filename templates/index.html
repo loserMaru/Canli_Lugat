@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Translations
+    </title>
+</head>
+<body>
+<h1>Translations</h1>
+<div>
+    <ul>
+    </ul>
+    <h2>Words from variable a:</h2>
+    <ul>
+        {% for word in b.split() %}
+             <span class="tooltip" id="word" about="{{ word[0] }}">{{ word[1].split()[0] }}</span>
+        {% endfor %}
+    </ul>
+</div>
+
+</body>
+<style>
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+
+<script>
+    var word_trans = {{ translations|safe }};
+    console.log(word_trans);
+    // Получаем все элементы с id='word'
+    var words = document.querySelectorAll('#word');
+
+    // Добавляем обработчик события наведения курсора на каждый элемент
+    words.forEach(function (word) {
+        word.addEventListener('mouseover', function () {
+            // Проверяем, существует ли уже tooltip
+            var tooltip = this.querySelector('.tooltiptext');
+            if (!tooltip) {
+                // Создаем tooltip
+                tooltip = document.createElement('span');
+                tooltip.classList.add('tooltiptext');
+                tooltip.innerHTML = word_trans[this.getAttribute('about')];
+                this.appendChild(tooltip);
+            } else {
+                // Показываем существующий tooltip
+                tooltip.style.visibility = 'visible';
+                tooltip.style.opacity = '1';
+            }
+        });
+
+        word.addEventListener('mouseout', function () {
+            // Скрываем и удаляем tooltip
+            var tooltip = this.querySelector('.tooltiptext');
+            if (tooltip) {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+                this.removeChild(tooltip);
+            }
+        });
+    });
+</script>
+
