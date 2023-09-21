@@ -16,10 +16,14 @@ def create_app():
     # Blueprints
     app.register_blueprint(home_bp)
     app.register_blueprint(page_bp)
+
+    with app.app_context():
+        db.create_all()
+
     return app
 
 
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port=3306, debug=True)
