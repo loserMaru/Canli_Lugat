@@ -3,6 +3,7 @@ from flask import Flask
 from config import Config
 from extensions.database_extension import db
 from routes.home import home_bp
+from routes.page import page_bp
 
 
 def create_app():
@@ -14,6 +15,7 @@ def create_app():
 
     # Blueprints
     app.register_blueprint(home_bp)
+    app.register_blueprint(page_bp)
     return app
 
 
