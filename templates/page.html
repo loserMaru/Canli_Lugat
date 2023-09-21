@@ -1,6 +1,113 @@
 <body>
-    <h1>Title</h1>
-    {% for word in words %}
-        {{ word }}
-    {% endfor %}
+<h1>Translations</h1>
+<div>
+    <div>
+        {%- for index, word in words -%}
+            <span {% if index|int != -1 %}
+                    class="tooltip"
+                    id="word"
+                    about="{{ index }}"
+                {% endif %}
+            >{{ word|safe }}</span>
+        {%- endfor -%}
+    </div>
+</div>
+
 </body>
+<style>
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+
+<script>
+    var word_trans = {{ translations|safe }};
+    console.log(word_trans);
+
+    // Функция для получения перевода слова или фразы
+    function getTranslation(word) {
+        var translation = word_trans[word];
+        return translation ? translation : "Перевод не найден, предложите свой перевод";
+    }
+
+    // Функция для коррекции положения tooltiptext
+    function adjustTooltipPosition(tooltip, wordElement) {
+    var rect = wordElement.getBoundingClientRect();
+    var tooltipHeight = tooltip.offsetHeight;
+
+    // Проверяем, есть ли достаточно места снизу для tooltip
+    if (rect.bottom + tooltipHeight <= window.innerHeight) {
+        // Если место есть, позиционируем tooltip под элементом
+        tooltip.style.top = '100%';
+        tooltip.style.bottom = 'initial';
+    } else if (rect.top - tooltipHeight >= 0) {
+        // Если место есть сверху, позиционируем tooltip над элементом
+        tooltip.style.top = 'initial';
+        tooltip.style.bottom = '100%';
+    } else {
+        // Если места ни снизу, ни сверху нет, позиционируем tooltip по центру элемента
+        tooltip.style.top = '50%';
+        tooltip.style.bottom = 'initial';
+        tooltip.style.transform = 'translateY(-50%)';
+    }
+}
+
+    // Получаем все элементы с id='word'
+    var words = document.querySelectorAll('#word');
+
+    // Добавляем обработчик события наведения курсора на каждый элемент
+    words.forEach(function (word) {
+        word.addEventListener('mouseenter', function () {
+            // Проверяем, существует ли уже tooltip
+            var tooltip = this.querySelector('.tooltiptext');
+            if (!tooltip) {
+                // Создаем tooltip
+                tooltip = document.createElement('span');
+                tooltip.classList.add('tooltiptext');
+                var translation = getTranslation(this.getAttribute('about'));
+                tooltip.innerHTML = translation;
+                this.appendChild(tooltip);
+            }
+
+            // Корректируем положение tooltip
+            adjustTooltipPosition(tooltip, this);
+            // Показываем tooltip
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
+        });
+
+        word.addEventListener('mouseleave', function () {
+            // Скрываем и удаляем tooltip
+            var tooltip = this.querySelector('.tooltiptext');
+            if (tooltip) {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+                this.removeChild(tooltip);
+            }
+        });
+    });
+</script>
