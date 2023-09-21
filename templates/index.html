@@ -47,28 +47,60 @@
 <script>
     var word_trans = {{ translations|safe }};
     console.log(word_trans);
+
+    // Функция для получения перевода слова или фразы
+    function getTranslation(word) {
+        var translation = word_trans[word];
+        return translation ? translation : "Перевод не найден, предложите свой перевод";
+    }
+
+    // Функция для коррекции положения tooltiptext
+    function adjustTooltipPosition(tooltip, wordElement) {
+    var rect = wordElement.getBoundingClientRect();
+    var tooltipHeight = tooltip.offsetHeight;
+
+    // Проверяем, есть ли достаточно места снизу для tooltip
+    if (rect.bottom + tooltipHeight <= window.innerHeight) {
+        // Если место есть, позиционируем tooltip под элементом
+        tooltip.style.top = '100%';
+        tooltip.style.bottom = 'initial';
+    } else if (rect.top - tooltipHeight >= 0) {
+        // Если место есть сверху, позиционируем tooltip над элементом
+        tooltip.style.top = 'initial';
+        tooltip.style.bottom = '100%';
+    } else {
+        // Если места ни снизу, ни сверху нет, позиционируем tooltip по центру элемента
+        tooltip.style.top = '50%';
+        tooltip.style.bottom = 'initial';
+        tooltip.style.transform = 'translateY(-50%)';
+    }
+}
+
     // Получаем все элементы с id='word'
     var words = document.querySelectorAll('#word');
 
     // Добавляем обработчик события наведения курсора на каждый элемент
     words.forEach(function (word) {
-        word.addEventListener('mouseover', function () {
+        word.addEventListener('mouseenter', function () {
             // Проверяем, существует ли уже tooltip
             var tooltip = this.querySelector('.tooltiptext');
             if (!tooltip) {
                 // Создаем tooltip
                 tooltip = document.createElement('span');
                 tooltip.classList.add('tooltiptext');
-                tooltip.innerHTML = word_trans[this.getAttribute('about')];
+                var translation = getTranslation(this.getAttribute('about'));
+                tooltip.innerHTML = translation;
                 this.appendChild(tooltip);
-            } else {
-                // Показываем существующий tooltip
-                tooltip.style.visibility = 'visible';
-                tooltip.style.opacity = '1';
             }
+
+            // Корректируем положение tooltip
+            adjustTooltipPosition(tooltip, this);
+            // Показываем tooltip
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
         });
 
-        word.addEventListener('mouseout', function () {
+        word.addEventListener('mouseleave', function () {
             // Скрываем и удаляем tooltip
             var tooltip = this.querySelector('.tooltiptext');
             if (tooltip) {
@@ -79,4 +111,3 @@
         });
     });
 </script>
-

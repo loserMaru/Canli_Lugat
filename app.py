@@ -21,7 +21,7 @@ app = create_app()
 
 @app.route('/')
 def index():
-    book = """Макаронлар, лезетли! малинаны. марлядан мархагъа мансурлы"""
+    book = """Макаронлар, лезетли! малинаны. марлядан мархагъа мансурлы макъас одфоывд"""
     words_and_punctuation = re.findall(r'\w+|\W+', book)
 
     counter = 0
@@ -50,7 +50,6 @@ def index():
                 if word.endswith(suffix):
                     inf = word[:-len(suffix)]
                     db_words = Word.query.filter(Word.word.ilike(f'{inf}'))
-                    # print(db_words.all())
                     break
             else:
                 continue
