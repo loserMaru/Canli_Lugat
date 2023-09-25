@@ -47,6 +47,4 @@ def index():
         for db_word in db_words:
             translations[i].append([db_word.word, db_word.translation])
 
-        print(translations)
-
     return render_template('index.html', translations=translations, words=book_words)

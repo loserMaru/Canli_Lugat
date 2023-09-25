@@ -47,7 +47,6 @@
 
 <script>
     var word_trans = {{ translations|safe }};
-    console.log(word_trans);
 
     // Функция для получения перевода слова или фразы
     function getTranslation(word) {
@@ -112,7 +111,6 @@
                 tooltip = document.createElement('span');
                 tooltip.classList.add('tooltiptext');
                 var translation = getTranslation(this.getAttribute('about'));
-                console.log(translation);
                 tooltip.innerHTML = translation;
                 this.appendChild(tooltip);
             }
