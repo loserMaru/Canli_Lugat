@@ -4,12 +4,13 @@
     <div>
         {%- for index, word in words -%}
             <span {% if index|int != -1 %}
-                    class="tooltip"
-                    id="word"
-                    about="{{ index }}"
-                {% endif %}
+                class="tooltip"
+                id="word"
+                about="{{ index }}"
+            {% endif %}
             >{{ word|safe }}</span>
         {%- endfor -%}
+
     </div>
 </div>
 
@@ -24,7 +25,7 @@
     .tooltip .tooltiptext {
         visibility: hidden;
         width: 120px;
-        background-color: #555;
+        background-color: #000000;
         color: #fff;
         text-align: center;
         border-radius: 6px;
@@ -50,31 +51,53 @@
 
     // Функция для получения перевода слова или фразы
     function getTranslation(word) {
-        var translation = word_trans[word];
-        return translation ? translation : "Перевод не найден, предложите свой перевод";
+        var translations = word_trans[word];
+        if (translations && translations.length > 0) {
+            var translationText = "";
+            var addedOtherVariantsLabel = false; // Переменная для отслеживания добавления надписи "Другие варианты"
+
+            for (var i = 0; i < translations.length; i++) {
+                var translation = translations[i][0].replace(/\d+/g, ''); // Убираем цифры из слова
+                var meaning = translations[i][1];
+
+                if (i === 0) {
+                    translationText += "<strong>" + translation + "</strong>" + ": " + "<br>" + meaning + "<br>";
+                } else {
+                    if (!addedOtherVariantsLabel) {
+                        translationText += "<strong>" + "Другие варианты: " + "</strong>" + "<br>";
+                        addedOtherVariantsLabel = true; // Устанавливаем флаг, чтобы не добавлять надпись снова
+                    }
+                    translationText += "<strong>" + translation + "</strong>" + ": " + "<br>" + meaning + "<br>";
+                }
+            }
+            return translationText;
+        } else {
+            return "Перевод не найден. Предложите свой";
+        }
     }
+
 
     // Функция для коррекции положения tooltiptext
     function adjustTooltipPosition(tooltip, wordElement) {
-    var rect = wordElement.getBoundingClientRect();
-    var tooltipHeight = tooltip.offsetHeight;
+        var rect = wordElement.getBoundingClientRect();
+        var tooltipHeight = tooltip.offsetHeight;
 
-    // Проверяем, есть ли достаточно места снизу для tooltip
-    if (rect.bottom + tooltipHeight <= window.innerHeight) {
-        // Если место есть, позиционируем tooltip под элементом
-        tooltip.style.top = '100%';
-        tooltip.style.bottom = 'initial';
-    } else if (rect.top - tooltipHeight >= 0) {
-        // Если место есть сверху, позиционируем tooltip над элементом
-        tooltip.style.top = 'initial';
-        tooltip.style.bottom = '100%';
-    } else {
-        // Если места ни снизу, ни сверху нет, позиционируем tooltip по центру элемента
-        tooltip.style.top = '50%';
-        tooltip.style.bottom = 'initial';
-        tooltip.style.transform = 'translateY(-50%)';
+        // Проверяем, есть ли достаточно места снизу для tooltip
+        if (rect.bottom + tooltipHeight <= window.innerHeight) {
+            // Если место есть, позиционируем tooltip под элементом
+            tooltip.style.top = '100%';
+            tooltip.style.bottom = 'initial';
+        } else if (rect.top - tooltipHeight >= 0) {
+            // Если место есть сверху, позиционируем tooltip над элементом
+            tooltip.style.top = 'initial';
+            tooltip.style.bottom = '100%';
+        } else {
+            // Если места ни снизу, ни сверху нет, позиционируем tooltip по центру элемента
+            tooltip.style.top = '50%';
+            tooltip.style.bottom = 'initial';
+            tooltip.style.transform = 'translateY(-50%)';
+        }
     }
-}
 
     // Получаем все элементы с id='word'
     var words = document.querySelectorAll('#word');
@@ -89,6 +112,7 @@
                 tooltip = document.createElement('span');
                 tooltip.classList.add('tooltiptext');
                 var translation = getTranslation(this.getAttribute('about'));
+                console.log(translation);
                 tooltip.innerHTML = translation;
                 this.appendChild(tooltip);
             }

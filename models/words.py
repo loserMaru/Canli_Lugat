@@ -15,3 +15,11 @@ class Word(db.Model):
     status = db.Column(db.Integer, default=0, nullable=False)
     language_id = db.Column(db.Integer, nullable=False)
     targetLanguage_id = db.Column(db.Integer, nullable=False)
+
+    @classmethod
+    def get_word_from_db(cls, word):
+        return Word.query.filter(Word.word.ilike(f'{word}%'))
+
+    @classmethod
+    def get_word_by_infinitive(cls, infinitive):
+        return Word.query.filter(Word.word.ilike(f'{infinitive}'))

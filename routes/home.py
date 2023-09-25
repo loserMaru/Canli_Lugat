@@ -9,7 +9,7 @@ home_bp = Blueprint('home', __name__, template_folder='templates')
 
 @home_bp.route('/')
 def index():
-    book = """Макаронлар, лезетли! малинаны. марлядан мархагъа мансурлы макъас одфоывд"""
+    book = """Макаронлар, лезетли! малинаны. марлядан мархагъа мансурлы макъас одфоывд машалла, лаборантлыкъ! лагъабы"""
     words_and_punctuation = re.findall(r'\w+|\W+', book)
 
     counter = 0
@@ -29,22 +29,24 @@ def index():
          .replace(':', '')
          .replace('.', ''))
     words = a.split()
-    translations = {}
+    translations = [[] for _ in range(len(words))]
 
     for i, word in enumerate(words):
-        db_words = Word.query.filter(Word.word.ilike(f'{word}%'))
+        db_words = Word.get_word_from_db(word)
+        print(db_words)
         if db_words.count() == 0:
             for suffix in ["дан", "тан", "лар", "лер", "гъа", "къа", "лы", "ли", "ны", "ни", "макъ", "мек", "гъы",
                            "къ"]:
                 if word.endswith(suffix):
                     inf = word[:-len(suffix)]
-                    db_words = Word.query.filter(Word.word.ilike(f'{inf}'))
+                    db_words = Word.get_word_by_infinitive(inf)
                     break
             else:
                 continue
 
         for db_word in db_words:
-            print(f'{word} => {db_word.word} - {db_word.translation}')
-            translations[i] = (db_word.word, db_word.translation)
+            translations[i].append([db_word.word, db_word.translation])
+
+        print(translations)
 
     return render_template('index.html', translations=translations, words=book_words)

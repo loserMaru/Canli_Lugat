@@ -1,6 +1,7 @@
 from flask import Flask
 
 from config import Config
+from database import initialize_database
 from extensions.database_extension import db
 from routes.home import home_bp
 from routes.page import page_bp
@@ -17,8 +18,7 @@ def create_app():
     app.register_blueprint(home_bp)
     app.register_blueprint(page_bp)
 
-    with app.app_context():
-        db.create_all()
+    initialize_database(app)
 
     return app
 
